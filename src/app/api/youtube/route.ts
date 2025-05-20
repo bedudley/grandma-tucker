@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const CHANNEL_ID = 'UCGttrUON87gWfU6dMWm1fcA'; // Tucker Carlson
-const YOUTUBE_API_URL = `https://www.googleapis.com/youtube/v3/search?key=${YOUTUBE_API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=1`;
 
 export async function GET() {
   if (!YOUTUBE_API_KEY) {
@@ -18,8 +17,8 @@ export async function GET() {
 
   const searchData = await searchRes.json();
   const videoIds = searchData.items
-    .filter((item: any) => item.id.kind === 'youtube#video')
-    .map((item: any) => item.id.videoId)
+    .filter((item: { id: { kind: string; videoId: string } }) => item.id.kind === 'youtube#video')
+    .map((item: { id: { videoId: string } }) => item.id.videoId)
     .join(',');
 
   if (!videoIds) {
@@ -34,7 +33,11 @@ export async function GET() {
   }
 
   const videosData = await videosRes.json();
-  const fullLengthVideo = videosData.items.find((video: any) => {
+  const fullLengthVideo = videosData.items.find((video: {
+    id: string;
+    contentDetails: { duration: string };
+    snippet: { title: string };
+  }) => {
     const duration = video.contentDetails.duration;
     // Parse ISO 8601 duration, e.g., PT5M30S
     const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
