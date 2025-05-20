@@ -10,12 +10,20 @@ type Episode = {
 
 export default function Home() {
   const [episode, setEpisode] = useState<Episode | null>(null);
+  const [videoId, setVideoId] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/episode')
       .then((res) => res.json())
       .then(setEpisode)
       .catch((err) => console.error('Failed to fetch episode', err));
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/youtube')
+      .then((res) => res.json())
+      .then(data => setVideoId(data.videoId))
+      .catch((err) => console.error('Failed to fetch video', err));
   }, []);
 
   return (
@@ -32,14 +40,16 @@ export default function Home() {
           {/* Video Embed */}
           <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }}>
             <div style={{ position: 'relative', width: '100%', maxWidth: '560px', aspectRatio: '16/9' }}>
-              <iframe
-                style={{ width: '100%', height: '100%' }}
-                src="https://www.youtube.com/embed/7KufJvBEYZQ"
-                title="Tucker Carlson Video"
-                frameBorder="0"
-                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+              {videoId && (
+                <iframe
+                  style={{ width: '100%', height: '100%' }}
+                  src={videoId ? `https://www.youtube.com/embed/${videoId}` : ''}
+                  title="Tucker Carlson Video"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              )}
             </div>
           </div>
 
