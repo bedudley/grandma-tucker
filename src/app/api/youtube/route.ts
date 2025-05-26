@@ -45,7 +45,7 @@ export async function GET() {
     const minutes = parseInt(match?.[2] || '0', 10);
     const seconds = parseInt(match?.[3] || '0', 10);
     const totalSeconds = hours * 3600 + minutes * 60 + seconds;
-    return totalSeconds > 60; // not a short
+    return totalSeconds > 60 * 5; // not a short or clip (hopefully)
   });
 
   if (!fullLengthVideo) {
